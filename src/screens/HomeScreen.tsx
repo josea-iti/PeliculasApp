@@ -1,15 +1,16 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { ActivityIndicator, Dimensions, FlatList, View } from 'react-native'
-import { useMovies } from '../hooks/useMovies';
-import { MoviePoster } from '../components/MoviePoster';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
+
+import Carousel from 'react-native-snap-carousel';
+
+import { useMovies } from '../hooks/useMovies';
+import { MoviePoster } from '../components/MoviePoster';
 import { HorizontalSlider } from '../components/HorizontalSlider';
 import { GradientBackground } from '../components/GradientBackground';
-import ImageColors from "react-native-image-colors";
 import { getImageColors } from '../helpers/getColores';
 import { GradientContext } from '../context/GradientContext';
-import { useEffect } from 'react';
 
 const {width: windowWidth} = Dimensions.get('window');
 
@@ -25,7 +26,7 @@ export const HomeScreen = () => {
     const [primary='green', secondary='orange'] = await getImageColors(uri);
     setMainColorsPub({primary, secondary});
   }
-
+  
   useEffect(() => {
     if (nowPlaying.length > 0) {
       getPosterColors(0);
@@ -44,7 +45,18 @@ export const HomeScreen = () => {
     <GradientBackground>
       <ScrollView>
         <View style={{height: 440, marginTop: top + 20}}>
-          <FlatList
+
+          <Carousel
+            data={nowPlaying}
+            renderItem={({item}: any) => (
+              <MoviePoster movie={item}/>
+            )}
+            sliderWidth={windowWidth}
+            itemWidth={300}
+            inactiveSlideOpacity={0.9}
+            onSnapToItem={index => getPosterColors(index)}
+          />
+          {/* <FlatList
             data={nowPlaying}
             renderItem={({item}: any) => (
               <MoviePoster movie={item}/>
@@ -53,7 +65,7 @@ export const HomeScreen = () => {
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             // onScroll={({item}: any) => getPosterColors(item)}
-          />
+          /> */}
         </View>
         <HorizontalSlider title='Populares' movies={popular}/>
         <HorizontalSlider title='Top Rated' movies={topRated}/>
